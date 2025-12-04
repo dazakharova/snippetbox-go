@@ -7,11 +7,13 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/dazakharova/snippetbox-go/internal/models"
 	_ "github.com/go-sql-driver/mysql"
 )
 
 type application struct {
-	logger *slog.Logger
+	logger   *slog.Logger
+	snippets models.SnippetModel
 }
 
 func main() {
@@ -23,10 +25,6 @@ func main() {
 
 	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
 
-	app := &application{
-		logger: logger,
-	}
-
 	logger.Info("starting server", slog.String("addr", *addr))
 
 	db, err := openDB(*dsn)
@@ -35,6 +33,11 @@ func main() {
 		os.Exit(1)
 	}
 	defer db.Close()
+
+	app := &application{
+		logger:   logger,
+		snippets: models.SnippetModel{DB: db},
+	}
 
 	err = http.ListenAndServe(*addr, app.routes())
 	logger.Error(err.Error())
