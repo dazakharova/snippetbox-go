@@ -34,8 +34,6 @@ func main() {
 
 	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
 
-	logger.Info("starting server", slog.String("addr", *addr))
-
 	db, err := openDB(*dsn)
 	if err != nil {
 		logger.Error(err.Error())
@@ -63,7 +61,15 @@ func main() {
 		sessionManager: sessionManager,
 	}
 
-	err = http.ListenAndServe(*addr, app.routes())
+	srv := &http.Server{
+		Addr:     *addr,
+		Handler:  app.routes(),
+		ErrorLog: slog.NewLogLogger(logger.Handler(), slog.LevelError),
+	}
+
+	logger.Info("starting server", slog.String("addr", *addr))
+
+	err = srv.ListenAndServe()
 	logger.Error(err.Error())
 	os.Exit(1)
 }
