@@ -11,6 +11,9 @@
     <header>
         <h1><a href='/'>Snippetbox</a></h1>
     </header>
+    {{with .Flash}}
+    <div class="flash">{{.}}</div> 
+    {{end}}
     {{template "nav" .}}
     <main>
         {{template "main" .}}
