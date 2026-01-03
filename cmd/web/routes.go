@@ -2,13 +2,14 @@ package main
 
 import (
 	"net/http"
+
+	"github.com/dazakharova/snippetbox-go/ui"
 )
 
 func (app *application) routes() http.Handler {
 	mux := http.NewServeMux()
 
-	fileServer := http.FileServer(http.Dir("./ui/static"))
-	mux.Handle("/static/", http.StripPrefix("/static", fileServer))
+	mux.Handle("/static/", http.FileServerFS(ui.Files))
 
 	//Unprotected routes
 	mux.Handle("GET /{$}", app.sessionManager.LoadAndSave(preventCSRF(app.authenticate(http.HandlerFunc(app.home)))))
