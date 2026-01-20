@@ -24,5 +24,5 @@ func (app *application) routes() http.Handler {
 	mux.Handle("POST /snippet/create", app.sessionManager.LoadAndSave(preventCSRF(app.authenticate(app.requireAuthentication(http.HandlerFunc(app.snippetCreatePost))))))
 	mux.Handle("POST /user/logout", app.sessionManager.LoadAndSave(preventCSRF(app.authenticate(app.requireAuthentication(http.HandlerFunc(app.userLogoutPost))))))
 
-	return app.recoverPanic(app.logRequest(commonHeader(mux)))
+	return app.recoverPanic(app.logRequest(commonHeaders(mux)))
 }
