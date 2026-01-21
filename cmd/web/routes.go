@@ -11,6 +11,8 @@ func (app *application) routes() http.Handler {
 
 	mux.Handle("/static/", http.FileServerFS(ui.Files))
 
+	mux.HandleFunc("GET /ping", ping)
+
 	//Unprotected routes
 	mux.Handle("GET /{$}", app.sessionManager.LoadAndSave(preventCSRF(app.authenticate(http.HandlerFunc(app.home)))))
 	mux.Handle("GET /snippet/view/{id}", app.sessionManager.LoadAndSave(preventCSRF(app.authenticate(http.HandlerFunc(app.snippetView)))))
