@@ -2,11 +2,13 @@ package main
 
 import (
 	"bytes"
+	"html"
 	"io"
 	"log/slog"
 	"net/http"
 	"net/http/cookiejar"
 	"net/http/httptest"
+	"regexp"
 	"testing"
 	"time"
 
@@ -93,4 +95,15 @@ func (ts *testServer) get(t *testing.T, urlPath string) testResponse {
 		cookies: res.Cookies(),
 		body:    string(bytes.TrimSpace(body)),
 	}
+}
+
+func extractCSRFToken(t *testing.T, body string) string {
+	csrfTokenRX := regexp.MustCompile(`<input type='hidden' name='csrf_token' value='(.+)'>`)
+
+	matches := csrfTokenRX.FindStringSubmatch(body)
+	if len(matches) < 2 {
+		t.Fatal("no csrf token found in body")
+	}
+
+	return html.UnescapeString(matches[1])
 }
